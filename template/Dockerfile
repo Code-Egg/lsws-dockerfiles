@@ -7,7 +7,15 @@ ENV PHPINI_PATH="$LS_FD/$PHP_VERSION/etc/php/*/litespeed/php.ini"
 RUN apt-get update && apt-get install wget curl tzdata cron -y
 
 COPY lsws-install.sh /
-RUN chmod +x /lsws-install.sh && bash /lsws-install.sh $LSWS_VERSION
+RUN chmod +x /lsws-install.sh
+
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+        bash /lsws-install.sh $LSWS_VERSION --arch x86_64; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        bash /lsws-install.sh $LSWS_VERSION --arch aarch64; \
+    else \
+        echo "$TARGETPLATFORM is not supported"; \
+    fi
 
 RUN wget -O - https://repo.litespeed.sh | bash
 

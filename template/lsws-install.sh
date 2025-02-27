@@ -5,6 +5,7 @@ ADMIN_PASS='litespeed'
 LSDIR='/usr/local/lsws'
 LSWS_MAIN='5'
 LSWS_VERSION=''
+ARCH='linux/amd64'
 
 check_input(){
     if [ -z "${1}" ]; then
@@ -32,7 +33,7 @@ get_main_ver(){
 }
 
 lsws_download(){
-    wget -q --no-check-certificate https://www.litespeedtech.com/packages/${LSWS_MAIN}.0/lsws-${LSWS_VERSION}-ent-x86_64-linux.tar.gz
+    wget -q --no-check-certificate https://www.litespeedtech.com/packages/${LSWS_MAIN}.0/lsws-${LSWS_VERSION}-ent-${ARCH}-linux.tar.gz
     tar xzf lsws-*-ent-x86_64-linux.tar.gz && rm -f lsws-*.tar.gz
     cd lsws-${LSWS_VERSION}
     add_trial
@@ -97,8 +98,21 @@ lsws_restart(){
     ${LSDIR}/bin/lswsctrl start
 }
 
-main(){
-    check_input ${1}
+check_input ${1}
+while [ ! -z "${1}" ]; do
+    case ${1} in
+        -[aA] | -arch | --arch) shift
+            check_input "${1}"
+            ARCH="${1}"
+            ;;        
+        *) 
+            'Please check the input value!'
+            ;;              
+    esac
+    shift
+done
+
+main(){    
     basic_install
     get_main_ver
     lsws_download
@@ -112,4 +126,4 @@ main(){
     del_trial
 }
 
-main ${1}
+main ${1} ${2}

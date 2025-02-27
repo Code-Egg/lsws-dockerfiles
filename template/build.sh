@@ -4,9 +4,10 @@ PHP_VERSION=''
 PUSH=''
 CONFIG=''
 TAG=''
-BUILDER='litespeedtech'
+BUILDER='eggcold'
 REPO='litespeed'
 EPACE='        '
+ARCH='linux/amd64'
 
 echow(){
     FLAG=${1}
@@ -20,6 +21,8 @@ help_message(){
     echo "${EPACE}${EPACE}Example: bash build.sh --lsws 6.3.1 --php lsphp83"
     echow '--push'
     echo "${EPACE}${EPACE}Example: build.sh --lsws 6.3.1 --php lsphp83 --push, will push to the dockerhub"
+    echow '--arch'
+    echo "${EPACE}${EPACE}Example: build.sh --ols 6.3.1 --php lsphp83 --arch linux/amd64,linux/arm64, will build image for both amd64 and arm64, otherwise linux/amd64 will be applied."        
     exit 0
 }
 
@@ -34,7 +37,8 @@ build_image(){
         help_message
     else
         echo "${1} ${2}"
-        docker build . --tag ${BUILDER}/${REPO}:${1}-${2} --build-arg LSWS_VERSION=${1} --build-arg PHP_VERSION=${2}
+        #docker build . --tag ${BUILDER}/${REPO}:${1}-${2} --build-arg LSWS_VERSION=${1} --build-arg PHP_VERSION=${2}
+        docker buildx build . --platform ${ARCH} --tag ${BUILDER}/${REPO}:${1}-${2} --build-arg OLS_VERSION=${1} --build-arg PHP_VERSION=${2} --output=type=registry
     fi    
 }
 
@@ -63,10 +67,12 @@ push_image(){
         if [ -f ~/.docker/litespeedtech/config.json ]; then
             CONFIG=$(echo --config ~/.docker/litespeedtech)
         fi
-        docker ${CONFIG} push ${BUILDER}/${REPO}:${1}-${2}
+        #docker ${CONFIG} push ${BUILDER}/${REPO}:${1}-${2}
+        docker buildx build . --platform ${ARCH} --tag ${BUILDER}/${REPO}:${1}-${2} --build-arg OLS_VERSION=${1} --build-arg PHP_VERSION=${2} --output=type=registry --push
         if [ ! -z "${TAG}" ]; then
-            docker tag ${BUILDER}/${REPO}:${1}-${2} ${BUILDER}/${REPO}:${3}
-            docker ${CONFIG} push ${BUILDER}/${REPO}:${3}
+            #docker tag ${BUILDER}/${REPO}:${1}-${2} ${BUILDER}/${REPO}:${3}
+            #docker ${CONFIG} push ${BUILDER}/${REPO}:${3}
+            docker buildx build . --platform ${ARCH} --tag ${BUILDER}/${REPO}:${3} --build-arg OLS_VERSION=${1} --build-arg PHP_VERSION=${2} --output=type=registry --push
         fi
     else
         echo 'Skip Push.'    
@@ -95,7 +101,11 @@ while [ ! -z "${1}" ]; do
             ;;
         -[tT] | -tag | -TAG | --tag) shift
             TAG="${1}"
-            ;;       
+            ;;
+        -[aA] | -arch | --arch) shift
+            check_input "${1}"
+            ARCH="${1}"
+            ;;                        
         --push )
             PUSH=true
             ;;            
