@@ -5,14 +5,27 @@ ADMIN_PASS='litespeed'
 LSDIR='/usr/local/lsws'
 LSWS_MAIN='5'
 LSWS_VERSION=''
-ARCH='linux/amd64'
+EPACE='        '
+ARCH='x86_64'
+
+echow(){
+    FLAG=${1}
+    shift
+    echo -e "\033[1m${EPACE}${FLAG}\033[0m${@}"
+}
+
+help_message(){
+    echo -e "\033[1mOPTIONS\033[0m"
+    echow '-L, --lsws [VERSION]'
+    echo "${EPACE}${EPACE}Example: bash lsws_install.sh --lsws 6.3.1"
+    echow '--arch'
+    echo "${EPACE}${EPACE}Example: build.sh --lsws 6.3.1 --arch [x86_64|aarch64], will build image for amd64 or arm64"
+    exit 0
+}
 
 check_input(){
     if [ -z "${1}" ]; then
-        echo 'Please specify a version!'
-        exit 1
-    else
-        LSWS_VERSION="${1}"
+        help_message
     fi
 }
 
@@ -101,13 +114,17 @@ lsws_restart(){
 check_input ${1}
 while [ ! -z "${1}" ]; do
     case ${1} in
+        -[lL] | -lsws | --lsws) shift
+            check_input "${1}"
+            LSWS_VERSION="${1}"
+            ;;
         -[aA] | -arch | --arch) shift
             check_input "${1}"
             ARCH="${1}"
-            ;;        
-        *) 
-            'Please check the input value!'
-            ;;              
+            ;;
+        *)
+            help_message
+            ;;                
     esac
     shift
 done

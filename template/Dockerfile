@@ -10,9 +10,9 @@ COPY lsws-install.sh /
 RUN chmod +x /lsws-install.sh
 
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-        bash /lsws-install.sh $LSWS_VERSION --arch x86_64; \
+        bash /lsws-install.sh --lsws $LSWS_VERSION --arch x86_64; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-        bash /lsws-install.sh $LSWS_VERSION --arch aarch64; \
+        bash /lsws-install.sh --lsws $LSWS_VERSION --arch aarch64; \
     else \
         echo "$TARGETPLATFORM is not supported"; \
     fi
