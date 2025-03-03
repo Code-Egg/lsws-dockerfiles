@@ -1,6 +1,8 @@
 FROM ubuntu:24.04
 ARG LSWS_VERSION
 ARG PHP_VERSION
+ARG TARGETPLATFORM
+
 ENV LS_FD='/usr/local/lsws'
 ENV PHPINI_PATH="$LS_FD/$PHP_VERSION/etc/php/*/litespeed/php.ini"
 
@@ -40,7 +42,6 @@ ENV PATH="/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin"
 
 ADD docker.xml $LS_FD/conf/templates/docker.xml
 ADD setup_docker.sh $LS_FD/bin/setup_docker.sh
-#ADD httpd_config.conf $LS_FD/conf/httpd_config.conf
 ADD htpasswd $LS_FD/admin/conf/htpasswd
 
 RUN $LS_FD/bin/setup_docker.sh $PHP_VERSION && rm $LS_FD/bin/setup_docker.sh
