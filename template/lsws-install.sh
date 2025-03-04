@@ -47,7 +47,7 @@ get_main_ver(){
 
 lsws_download(){
     wget -q --no-check-certificate https://www.litespeedtech.com/packages/${LSWS_MAIN}.0/lsws-${LSWS_VERSION}-ent-${ARCH}-linux.tar.gz
-    tar xzf lsws-*-ent-x86_64-linux.tar.gz && rm -f lsws-*.tar.gz
+    tar xzf lsws-*-ent-${ARCH}-linux.tar.gz && rm -f lsws-*.tar.gz
     cd lsws-${LSWS_VERSION}
     add_trial
 }
